@@ -1,0 +1,41 @@
+name: 10101010h
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    timeout-minutes: 9999
+
+    steps:
+    - name: Download Ngrok.
+      run: |
+        Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+        Invoke-WebRequest https://raw.githubusercontent.com/otcuccay/basictest/main/1.bat -OutFile 1.bat
+        Invoke-WebRequest https://raw.githubusercontent.com/otcuccay/basictest/main/2.bat -OutFile 2.bat
+        Invoke-WebRequest https://raw.githubusercontent.com/otcuccay/basictest/main/3.bat -OutFile 3.bat
+        Invoke-WebRequest https://raw.githubusercontent.com/otcuccay/basictest/main/wallpaper.png -OutFile wallpaper.png
+        Invoke-WebRequest https://is.gd/g4zM5K -OutFile Rooller.rar
+    - name: Extract Ngrok File.
+      run: |
+        Expand-Archive ngrok.zip
+    - name: Connect to Ngrok.
+      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+      env:
+        NGROK_AUTH_TOKEN: 1x7yb8t3BH9bnu6GOhxEJOLMnNI_3RzHLTuAHri1si1hTzAmg
+    - name: Enabling access to RDP.
+      run: | 
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+        copy wallpaper.png D:\a\wallpaper.png
+        copy wallpaper.bat D:\a\3.bat
+        copy Rooller.rar D:\a\Rooller.rar
+    - name: Open Tunnel.
+      run: |
+        Start-Process Powershell -ArgumentList '-Noexit -Command ".\ngrok\ngrok.exe tcp --region ap 3389"'
+    - name: Thông tin đăng.
+      run: cmd /c 2.bat
+    - name: Made Successfully! You Can Close Tab Now.
+      run: cmd /c 1.bat
